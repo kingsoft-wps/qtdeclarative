@@ -483,6 +483,7 @@ void QV4::Compiler::JSUnitGenerator::writeClass(char *b, const QV4::Compiler::Cl
         qDebug() << "=== Class" << stringForIndex(cls->nameIndex) << "static methods"
                  << cls->nStaticMethods << "methods" << cls->nMethods;
         qDebug() << "    constructor:" << cls->constructorFunction;
+#ifndef QT_NO_DEBUG_OUTPUT
         for (uint i = 0; i < cls->nStaticMethods + cls->nMethods; ++i) {
             QDebug output = qDebug().nospace();
             output << "    " << i << ": ";
@@ -500,6 +501,7 @@ void QV4::Compiler::JSUnitGenerator::writeClass(char *b, const QV4::Compiler::Cl
                    << cls->methodTable()[i].function;
         }
         qDebug().space();
+#endif
     }
 }
 
