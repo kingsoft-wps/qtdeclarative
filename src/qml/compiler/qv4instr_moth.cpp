@@ -105,7 +105,8 @@ static QString toString(QV4::ReturnedValue v)
 #define ABSOLUTE_OFFSET() \
     (code - start + offset)
 
-#define MOTH_BEGIN_INSTR(instr) \
+#if !defined(QT_NO_DEBUG_OUTPUT)
+#   define MOTH_BEGIN_INSTR(instr) \
     { \
         INSTR_##instr(MOTH_DECODE_WITH_BASE) \
         QDebug d = qDebug(); \
@@ -115,6 +116,16 @@ static QString toString(QV4::ReturnedValue v)
             --base_ptr; \
         d << alignedLineNumber(line) << alignedNumber(codeOffset).constData() << ": " \
           << rawBytes(base_ptr, int(code - base_ptr)) << #instr << " ";
+#else
+#   define MOTH_BEGIN_INSTR(instr) \
+    { \
+        INSTR_##instr(MOTH_DECODE_WITH_BASE) \
+        QNoDebug d = QMessageLogger().noDebug(); \
+        if (static_cast<int>(Instr::Type::instr) >= 0x100) \
+            --base_ptr; \
+        d << alignedLineNumber(line) << alignedNumber(codeOffset).constData() << ": " \
+          << rawBytes(base_ptr, int(code - base_ptr)) << #instr << " ";
+#endif
 
 #define MOTH_END_INSTR(instr) \
         continue; \
@@ -131,11 +142,13 @@ const int InstrInfo::argumentCount[] = {
 
 void dumpConstantTable(const Value *constants, uint count)
 {
+#ifndef QT_NO_DEBUG_OUTPUT
     QDebug d = qDebug();
     d.nospace();
     for (uint i = 0; i < count; ++i)
         d << alignedNumber(int(i)).constData() << ":    "
           << toString(constants[i].asReturnedValue()).toUtf8().constData() << "\n";
+#endif
 }
 
 QString dumpRegister(int reg, int nFormals)
