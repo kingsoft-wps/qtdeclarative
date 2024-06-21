@@ -44,6 +44,7 @@
 #include "qqmlprofilereventtype_p.h"
 
 #include <QtCore/qdatastream.h>
+#include <limits>
 
 //
 //  W A R N I N G
